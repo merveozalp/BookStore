@@ -17,7 +17,7 @@ namespace BookStore.DBOperations
                 {
                     return;
                 }
-                context.Books.AddRange(new PutBookModel
+                context.Books.AddRange(new Book
                 {
                     //Id = 1,
                     Title = "Çalıkuşu",
@@ -26,7 +26,7 @@ namespace BookStore.DBOperations
                     PublishDate = new DateTime(2001, 06, 12)
 
                 },
-            new PutBookModel
+            new Book
             {
                //Id = 2,
                 Title = "Suç Ve Ceza",
@@ -35,7 +35,7 @@ namespace BookStore.DBOperations
                 PublishDate = new DateTime(2001, 06, 12)
 
             },
-            new PutBookModel
+            new Book
             {
                //Id = 3,
                 Title = "Outlife",

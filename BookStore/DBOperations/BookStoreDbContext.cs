@@ -8,6 +8,6 @@ namespace BookStore
         {
 
         }
-        public DbSet<PutBookModel> Books { get; set; }
+        public DbSet<Book> Books { get; set; }
     }
 }

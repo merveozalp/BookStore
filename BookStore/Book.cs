@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BookStore
 {
-    public class PutBookModel
+    public class Book
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)] // otoimplament olması istediğimiz alan için kullanıyoruz.,frmatlı insert istersek computed kullanırız.
         public int Id { get; set; }

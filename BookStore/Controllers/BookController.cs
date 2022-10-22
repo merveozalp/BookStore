@@ -1,8 +1,7 @@
-﻿using BookStore.BookOperations.CreateBook;
-using BookStore.BookOperations.DeleteBook;
+﻿using AutoMapper;
+using BookStore.BookOperations.CreateBook;
 using BookStore.BookOperations.GetBooks;
 using BookStore.BookOperations.GetByIdBook;
-using BookStore.BookOperations.PutBook;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -19,10 +18,11 @@ namespace BookStore.Controllers
     public class BookController : ControllerBase
     {
         private readonly BookStoreDbContext dbContext;
-        public BookController(BookStoreDbContext dbContext)
+        private readonly IMapper mapper;
+        public BookController(BookStoreDbContext dbContext, IMapper mapper)
         {
-            this.dbContext=dbContext;
-
+            this.dbContext = dbContext;
+            this.mapper = mapper;
         }
 
         // static olmalı çünkü program çalıştıı srece lifecycle çalışmalı.
@@ -62,7 +62,7 @@ namespace BookStore.Controllers
 
         public IActionResult GetBooks()
         {
-            GetBooksQuery query = new GetBooksQuery(dbContext);
+            GetBooksQuery query = new GetBooksQuery(dbContext,mapper);
             var result= query.Handle();
             return Ok(result);
         }
@@ -72,13 +72,11 @@ namespace BookStore.Controllers
         public IActionResult GetById(int id)
         {
             GetByIdViewModel result;
-           
+            GetByIdBookQuery query = new GetByIdBookQuery(dbContext, mapper);
             try
             {
-                GetByIdBookQuery query = new GetByIdBookQuery(dbContext);
-                query.BookId=id;
-                result =query.Handle();
-
+                query.BookId = id;
+               result = query.Handle();
             }
             catch (Exception ex)
             {
@@ -86,13 +84,14 @@ namespace BookStore.Controllers
                 return BadRequest(ex.Message);
             }
             return Ok(result);
+
         }
 
 
         [HttpPost]
         public IActionResult CreateBook([FromBody] CreateBookModel newbook)
         {
-            CreateBookCommand bookCommand = new CreateBookCommand(dbContext);
+            CreateBookCommand bookCommand = new CreateBookCommand(dbContext,mapper);
             try
             {
                 bookCommand.Model = newbook;
@@ -112,35 +111,28 @@ namespace BookStore.Controllers
         [HttpPut("{id}")]
         public IActionResult EditBook(int id, [FromBody] PutModel updatebook)
         {
-            PutBookCommand putBookCommand = new PutBookCommand(dbContext);
-            try
-            {
-                putBookCommand.BookId = id;
-                putBookCommand.Model = updatebook;
-                putBookCommand.Handle();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-
+            //var  book = dbContext.Books.SingleOrDefault(x=>x.Id==id);
+            //if (book is null)
+            //{
+            //    return BadRequest();
+            //}
+            //book.Title=updatebook.Title != default ? updatebook.Title :book.Title;
+            //book.GenreId = updatebook.GenreId != default ? updatebook.GenreId : book.GenreId;
+            //book.PageCount=updatebook.PageCount != default ? updatebook.PageCount : book.PageCount;
+            //book.PublishDate = updatebook.PublishDate != default ? updatebook.PublishDate : book.PublishDate;
+            //dbContext.SaveChanges();
             return Ok();
         }
-
-
         [HttpDelete("{id}")]
         public IActionResult DeleteBook(int id)
         {
-            DeleteBookCommand command = new DeleteBookCommand(dbContext);
-            try
+            var book = dbContext.Books.SingleOrDefault(x => x.Id == id);
+            if (book is null)
             {
-                command.BookId = id;
-                command.Handle();
+                return BadRequest();
             }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            dbContext.Books.Remove(book);
+            dbContext.SaveChanges();
             return Ok();
         }
     }

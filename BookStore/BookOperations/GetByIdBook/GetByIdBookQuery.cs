@@ -1,4 +1,5 @@
-﻿using BookStore.Common;
+﻿using AutoMapper;
+using BookStore.Common;
 using System;
 using System.Linq;
 
@@ -8,11 +9,13 @@ namespace BookStore.BookOperations.GetByIdBook
     {
         public int BookId { get; set; }
 
-        private BookStoreDbContext dbContext;
+        private readonly BookStoreDbContext dbContext;
+        private readonly IMapper mapper;
 
-        public GetByIdBookQuery(BookStoreDbContext dbContext)
+        public GetByIdBookQuery(BookStoreDbContext dbContext, IMapper mapper)
         {
             this.dbContext = dbContext;
+            this.mapper = mapper;
         }
 
         public GetByIdViewModel Handle()
@@ -22,11 +25,7 @@ namespace BookStore.BookOperations.GetByIdBook
             {
                 throw new InvalidOperationException("Kitap Bulunamadı");
             }
-            GetByIdViewModel vm = new GetByIdViewModel();
-            vm.Title = book.Title;
-            vm.PageCount = book.PageCount;
-            vm.PublishDate = book.PublishDate.Date.ToString("dd/mm/yyyy");
-            vm.GenreName = ((GenreEnum)book.GenreId).ToString();
+            GetByIdViewModel vm =mapper.Map<GetByIdViewModel>(book);
             return vm;
 
 
